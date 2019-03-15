@@ -21,9 +21,14 @@ def decompress_krc(krcbytes):
         i = i + 1
 
     decode_bytes = zlib.decompress(bytearray(decompress_bytes)).decode('utf-8-sig')
-    decode_bytes = re.sub(r'<[^>]*>', '', decode_bytes)
+    #decode_bytes = re.sub(r'<[^>]*>', '', decode_bytes)
 
     for match in re.finditer(r'\[(\d*),\d*\]', decode_bytes):
+        ms = int(match.group(1))
+        time = '[%.2d:%.2d.%.2d]' % ((ms % (1000 * 60 * 60)) / (1000 * 60), (ms % (1000 * 60)) / 1000, (ms % (1000 * 60)) % 100)
+        decode_bytes = decode_bytes.replace(match.group(0), time)
+    
+    for match in re.finditer(r'\<(\d*),(\d*),\d*\>', decode_bytes):
         ms = int(match.group(1))
         time = '[%.2d:%.2d.%.2d]' % ((ms % (1000 * 60 * 60)) / (1000 * 60), (ms % (1000 * 60)) / 1000, (ms % (1000 * 60)) % 100)
         decode_bytes = decode_bytes.replace(match.group(0), time)
